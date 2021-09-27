@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    *{
+      box-sizing: border-box;
+    }
+    .chat{
+      width: 400px;
+      margin: 50px auto;
+    }
+    .messages{
+      width: 400px;
+      height: 400px;
+      border: solid red 3px;
+      padding: 20px;
+    }
+    .message{
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .send{
+      width: 400px;
+      height: 50px;
+      border: solid green 3px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat">
+    <div class="messages"></div>
+    <form class="send">
+      <input class="formInput" type="text" name="message">
+      <button>Отправить</button>
+    </form>
+  </div>
+  <script>
+    const form = document.querySelector(".send")
+    const formInput = form.querySelector(".formInput")
+    const messagesPlace = document.querySelector(".messages")
+    const id = window.location.pathname.slice(1)
+    const messages = []
+    let username
+
+    const send = (event) => {
+      event.preventDefault()
+      socket.send(JSON.stringify({sesionId: id, method: "Отправил", message: formInput.value, username}))
+    }
+    const greetings = (cameUsername) => {
+      if(cameUsername !== username){
+        alert(`Пользователь ${cameUsername} подключился`)
+      }
+    }
+    const write = ({username, message}) => {
+      formInput.value = ""
+      messages.push({username, message})
+      messagesPlace.innerHTML += `<div class="message"><div class="username">Имя:${username}</div><div class="inner">Сообщение:${message}</div></div>`
+    }
+
+
+    form.addEventListener("submit", send)
+
+    const socket = new WebSocket("ws://localhost:5000/ws")
+    socket.onopen = () => {
+      username = prompt("Введите ваше имя")
+      socket.send(JSON.stringify({sesionId: id, method: "Подключился", username}))
+    }
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      switch(data.method){
+        case "Подключился": greetings(data.username)
+          break 
+        case "Отправил": write({username: data.username, message: data.message})
+          break
+      }
+    }
+    
+  </script>
+</body>
+</html>

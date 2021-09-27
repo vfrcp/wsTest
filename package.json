@@ -1,0 +1,17 @@
+{
+  "name": "so",
+  "version": "1.0.0",
+  "description": "",
+  "main": "so.js",
+  "scripts": {
+    "start": "nodemon App.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-ws": "^5.0.2",
+    "nodemon": "^2.0.13"
+  }
+}
